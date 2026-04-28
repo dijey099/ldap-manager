@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const errorMessage = document.getElementById("error-message");
 
         try {
-            const response = await fetch("http://localhost:4444/auth", {
+            const response = await fetch("/api/auth", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username: username, password: password })
