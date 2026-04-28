@@ -569,8 +569,8 @@ def auth():
 
 @app.route('/api/user/list', methods=['GET'])
 def get_u():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     users = get_users()
     return make_response(
@@ -585,8 +585,8 @@ def get_u():
 
 @app.route('/api/user/add', methods=['POST'])
 def add_u():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -622,8 +622,8 @@ def add_u():
 
 @app.route('/api/user/delete', methods=['POST'])
 def delete_u():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -652,8 +652,8 @@ def delete_u():
 
 @app.route('/api/user/edit', methods=['POST'])
 def edit_u():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -691,8 +691,8 @@ def edit_u():
 
 @app.route('/api/group/list', methods=['GET'])
 def get_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     posix_groups, gon_groups = get_groups()
     return make_response(
@@ -710,8 +710,8 @@ def get_g():
 
 @app.route('/api/group/create', methods=['POST'])
 def create_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -742,8 +742,8 @@ def create_g():
 
 @app.route('/api/group/delete', methods=['POST'])
 def delete_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -772,8 +772,8 @@ def delete_g():
 
 @app.route('/api/group/edit', methods=['POST'])
 def edit_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -804,8 +804,8 @@ def edit_g():
 
 @app.route('/api/group/members/add', methods=['POST'])
 def add_member_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
@@ -835,8 +835,8 @@ def add_member_g():
 
 @app.route('/api/group/members/delete', methods=['POST'])
 def delete_member_g():
-    # if 'user' not in session:
-    #     return redirect(url_for("login"))
+    if 'user' not in session:
+        return redirect(url_for("login"))
 
     rdata = request.get_json()
 
