@@ -182,4 +182,4 @@ The dashboard features a **Glassmorphism** design:
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-Built with ❤️ by [Antigravity](https://github.com/google-deepmind)
+Built with ❤️ by dijey099 with help of[Antigravity](https://github.com/google-deepmind) for Frontend.
