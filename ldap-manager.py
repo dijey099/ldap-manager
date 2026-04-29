@@ -29,6 +29,8 @@ LDAP_SERVER = os.getenv('LDAP_SERVER', 'ldap://server.com')
 U_BASE_DN = os.getenv('U_BASE_DN', 'ou=people,dc=server,dc=com')
 G_BASE_DN = os.getenv('G_BASE_DN', 'ou=groups,dc=server,dc=com')
 
+DEPARTMENTS = os.getenv('DEPARTMENTS', 'HR,HSE,IS')
+
 ADMIN_DN = os.getenv('ADMIN_DN', 'cn=admin,dc=server,dc=come')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'v3rY5Ecre7')
 
@@ -426,8 +428,8 @@ def edit_group(name, new_name=None, new_description=None):
                 conn.unbind()
                 return False
         else:
-            logging.info(f"No change made for group {uid}")
-            return False
+            logging.info(f"No change made for group {name}")
+            return True
 
     except Exception as e:
         logging.error(f"Failed to edit group {name} - {e}")
@@ -537,7 +539,8 @@ def admin():
     if 'user' not in session:
         return redirect(url_for("login"))
 
-    return render_template("admin.html")
+    departments = DEPARTMENTS.split(',')
+    return render_template("admin.html", departments=departments, username=session['user'])
 
 
 @app.route('/api/auth', methods=['POST'])
@@ -553,7 +556,7 @@ def auth():
                 {
                     "code": 200,
                     "message": "Logged in",
-                    "token": "lol"
+                    "token": "LOL"
                 },
                 200
             )
@@ -871,4 +874,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host=SRV_ADDRESS, port=SRV_PORT)
+    app.run(debug=False, host=SRV_ADDRESS, port=SRV_PORT)

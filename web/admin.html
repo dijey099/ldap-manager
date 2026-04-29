@@ -1,21 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>LDAP Manager Login</title>
+    <title>LDAP Manager - Dashboard</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="shortcut icon" href="static/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="../static/css/admin.css">
-    <script type="text/javascript" src="../static/js/admin.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/admin.css">
+    <script type="text/javascript" src="static/js/admin.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
     <div class="background">
         <div class="shape"></div>
         <div class="shape"></div>
+        <div class="shape"></div>
     </div>
-    <div align="center" class="main-view">
-        
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="static/logo.png" alt="Logo" class="logo">
+                <h2>LDAP<span>Manager</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="users">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="nav-item" data-view="groups">
+                    <i class="fas fa-user-group"></i>
+                    <span>Groups</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="view-title">
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="user-actions">
+                    <span id="user-display"><i class="fas fa-user-circle"></i> {{ username }}</span>
+                    <button id="logout-btn" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Views -->
+            <div id="content-area">
+                <!-- Dashboard View -->
+                <section id="dashboard-view" class="view">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon u-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3 id="total-users">0</h3>
+                                <p>Total Users</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon g-icon"><i class="fas fa-user-group"></i></div>
+                            <div class="stat-info">
+                                <h3 id="total-groups">0</h3>
+                                <p>Total Groups</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon p-icon"><i class="fas fa-code"></i></div>
+                            <div class="stat-info">
+                                <h3 id="posix-groups-count">0</h3>
+                                <p>POSIX Groups</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon w-icon"><i class="fas fa-users-gear"></i></div>
+                            <div class="stat-info">
+                                <h3 id="gon-groups-count">0</h3>
+                                <p>Generic Groups</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-grid">
+                        <div class="recent-card">
+                            <div class="card-header">
+                                <h3>Last 5 Users</h3>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Full Name</th>
+                                            <th>Mail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-users-list">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="recent-card">
+                            <div class="card-header">
+                                <h3>Last 5 Groups</h3>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-groups-list">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Users View -->
+                <section id="users-view" class="view" style="display: none;">
+                    <div class="action-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="user-search" placeholder="Search users...">
+                        </div>
+                        <button class="btn btn-primary" id="add-user-btn">
+                            <i class="fas fa-plus"></i> Add User
+                        </button>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Department</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Groups View -->
+                <section id="groups-view" class="view" style="display: none;">
+                    <div class="action-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="group-search" placeholder="Search groups...">
+                        </div>
+                        <button class="btn btn-primary" id="add-group-btn">
+                            <i class="fas fa-plus"></i> Create Group
+                        </button>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Group Name</th>
+                                        <th>Type</th>
+                                        <th>GID</th>
+                                        <th>Description</th>
+                                        <th>Members</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groups-table-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Add New User</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="user-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" id="m-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" id="m-first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" id="m-last_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="mail" id="m-mail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone" id="m-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" id="m-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department" id="m-department" required>
+                            <option value="">Select Department</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept }}">{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" id="kind-container">
+                        <label>Account Type</label>
+                        <select name="kind" id="m-kind" required>
+                            <option value="0">Bastion Admin</option>
+                            <option value="1">Server Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="password-container">
+                        <label>Password</label>
+                        <input type="password" name="password" id="m-password"
+                            placeholder="Leave empty to keep current">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-user-btn">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Group Modal -->
+    <div id="group-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="group-modal-title">Create New Group</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="group-form">
+                <div class="form-group">
+                    <label>Group Name</label>
+                    <input type="text" name="name" id="g-name" required>
+                </div>
+                <div id="g-edit-name-container" class="form-group" style="display: none;">
+                    <label>New Group Name</label>
+                    <input type="text" name="new_name" id="g-new-name">
+                </div>
+                <div class="form-group" id="g-kind-container">
+                    <label>Group Type</label>
+                    <select name="kind" id="g-kind">
+                        <option value="0">POSIX Group</option>
+                        <option value="1">Generic Group</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="g-description" required></textarea>
+                </div>
+
+                <div id="g-members-section" style="display: none;">
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="margin-bottom: 15px;">Members Management</h4>
+
+                    <div class="form-group">
+                        <label>Add New Member</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="g-add-member-select" style="flex: 1;">
+                                <option value="">Select User to Add</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" id="g-add-member-btn"
+                                style="padding: 8px 15px;">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Current Members</label>
+                        <div id="g-members-list" class="members-container"
+                            style="max-height: 150px; overflow-y: auto; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 10px;">
+                            <!-- Dynamic list -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-group-btn">Save Group</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
 </body>
+
 </html>
