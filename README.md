@@ -59,7 +59,7 @@ DEPARTMENTS=HR,IT,Finance,Sales
 SRV_ADDRESS=0.0.0.0
 SRV_PORT=8080
 ```
-***ADMINS_DN is the group that contains users who have access to Admin Dashboard***
+*ADMINS_DN is the group that contains users who have access to Admin Dashboard*
 
 ### 4️⃣ Run the Application
 
