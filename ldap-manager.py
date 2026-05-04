@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import secrets
-from threading import Thread
 from dotenv import load_dotenv
 from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, MODIFY_ADD, MODIFY_DELETE
 from flask import Flask, request, make_response, session, render_template, redirect, url_for
@@ -218,13 +217,12 @@ def delete_user(uid):
             conn.unbind()
             return True
         else:
-            logging.error(f"Failed to delete user {uid} - {result['description']}")
+            logging.error(f"Failed to delete user {uid} - {conn.result}")
             conn.unbind()
             return False
 
     except Exception as e:
         logging.error(f"Failed to delete user {uid} - {e}")
-        conn.unbind()
         return False
 
 
@@ -390,11 +388,11 @@ def delete_group(name):
             logging.info(f"Group {name} deleted successfully")
             return True
         else:
-            logging.error(f"Failed to delete group {uid} - {result['description']}")
+            logging.error(f"Failed to delete group {name} - {status['description']}")
             return False
 
     except Exception as e:
-        logging.error(f"Failed to delete group {uid} - {e}")
+        logging.error(f"Failed to delete group {name} - {e}")
         return False
 
     finally:
