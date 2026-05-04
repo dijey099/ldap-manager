@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- State Management ---
     let users = [];
     let groups = { posix_groups: [], gon_groups: [] };
+    let logs = [];
     let currentView = 'dashboard';
     let editingUser = null;
     let editingGroup = null;
@@ -102,13 +103,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const titles = {
             'dashboard': 'Dashboard',
             'users': 'User Management',
-            'groups': 'Group Management'
+            'groups': 'Group Management',
+            'logs': 'Action Logs'
         };
         pageTitle.textContent = titles[viewName];
 
         if (viewName === 'dashboard') renderDashboard();
         if (viewName === 'users') renderUsers();
         if (viewName === 'groups') renderGroups();
+        if (viewName === 'logs') renderLogs();
     }
 
     // --- Rendering Logic ---
@@ -242,6 +245,37 @@ document.addEventListener("DOMContentLoaded", function () {
         }).join('');
     }
 
+    async function renderLogs(filter = '') {
+        const tableBody = document.getElementById('logs-table-body');
+        
+        try {
+            const response = await fetch('/api/logs/list');
+            if (response.ok) {
+                const data = await response.json();
+                logs = data.entries || [];
+            }
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+        }
+
+        const filteredLogs = logs.filter(l => {
+            const user = l.user.toLowerCase();
+            const ip = l.ip.toLowerCase();
+            const action = l.action.toLowerCase();
+            const f = filter.toLowerCase();
+            return user.includes(f) || ip.includes(f) || action.includes(f);
+        });
+
+        tableBody.innerHTML = filteredLogs.map(l => `
+            <tr>
+                <td><small>${l.timestamp}</small></td>
+                <td><strong>${l.user}</strong></td>
+                <td><code style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${l.ip}</code></td>
+                <td>${l.action}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align: center; color: #888;">No logs found</td></tr>';
+    }
+
     // --- Event Listeners ---
     function setupEventListeners() {
         // Navigation
@@ -329,6 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Search
         document.getElementById('user-search').addEventListener('input', (e) => renderUsers(e.target.value));
         document.getElementById('group-search').addEventListener('input', (e) => renderGroups(e.target.value));
+        document.getElementById('log-search').addEventListener('input', (e) => renderLogs(e.target.value));
     }
 
     // --- Handlers ---

@@ -2,6 +2,8 @@ import os
 import json
 import logging
 import secrets
+import sqlite3
+from datetime import datetime
 from dotenv import load_dotenv
 from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, MODIFY_ADD, MODIFY_DELETE
 from flask import Flask, request, make_response, session, render_template, redirect, url_for
@@ -34,6 +36,43 @@ ADMIN_DN = os.getenv('ADMIN_DN', 'cn=admin,dc=server,dc=come')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'v3rY5Ecre7')
 
 ADMINS_DN = os.getenv('ADMINS_DN', 'dc=server,dc=com')
+
+DB_PATH = "logs.db"
+
+
+def init_db():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                user TEXT NOT NULL,
+                ip TEXT NOT NULL,
+                action TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logging.error(f"Failed to initialize database: {e}")
+
+
+def log_action(action_text):
+    try:
+        user = session.get('user', 'system')
+        ip = request.remote_addr
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("INSERT INTO logs (timestamp, user, ip, action) VALUES (?, ?, ?, ?)",
+                  (timestamp, user, ip, action_text))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logging.error(f"Failed to log action: {e}")
 
 
 
@@ -342,14 +381,14 @@ def create_group(name, kind, description):
             next_gid = 10000
 
         att = {}
-        if kind == 0:
+        if kind == 0 or kind == "0":
             att = {
                 "cn": name.strip(), 
                 "objectClass": ["posixGroup"],
                 "description": description.strip(),
                 "gidNumber": next_gid
             }
-        elif kind == 1:
+        elif kind == 1 or kind == "1":
             att = {
                 "cn": name.strip(), 
                 "objectClass": ["groupOfNames"],
@@ -550,6 +589,7 @@ def auth():
     if username and password:
         if authenticate(username, password):
             session['user'] = username
+            log_action(f"User logged in successfully")
             return make_response(
                 {
                     "code": 200,
@@ -604,6 +644,7 @@ def add_u():
         success = add_user(uid, kind, givenName, sn, title, departmentNumber, mobile, mail)
 
         if success:
+            log_action(f"Added new user: {uid}")
             return make_response(
                 {
                     "code": 200,
@@ -634,6 +675,7 @@ def delete_u():
         success = delete_user(uid)
 
         if success:
+            log_action(f"Deleted user: {uid}")
             return make_response(
                 {
                     "code": 200,
@@ -673,6 +715,7 @@ def edit_u():
         success = edit_user(uid, cn, kind, givenName, sn, title, departmentNumber, mobile, mail, password)
 
         if success:
+            log_action(f"Edited user: {uid}")
             return make_response(
                 {
                     "code": 200,
@@ -724,6 +767,7 @@ def create_g():
         success = create_group(name, kind, description)
 
         if success:
+            log_action(f"Created new group: {name}")
             return make_response(
                 {
                     "code": 200,
@@ -754,6 +798,7 @@ def delete_g():
         success = delete_group(name)
 
         if success:
+            log_action(f"Deleted group: {name}")
             return make_response(
                 {
                     "code": 200,
@@ -786,6 +831,7 @@ def edit_g():
         success = edit_group(name, new_name, new_description)
 
         if success:
+            log_action(f"Edited group: {name}")
             return make_response(
                 {
                     "code": 200,
@@ -817,6 +863,7 @@ def add_member_g():
         success = add_members(group_name, new_members)
 
         if success:
+            log_action(f"Added members {', '.join(new_members)} to group: {group_name}")
             return make_response(
                 {
                     "code": 200,
@@ -848,6 +895,7 @@ def delete_member_g():
         success = delete_members(name, members)
 
         if success:
+            log_action(f"Removed members {', '.join(members)} from group: {name}")
             return make_response(
                 {
                     "code": 200,
@@ -871,5 +919,39 @@ def logout():
     return redirect(url_for("login"))
 
 
+@app.route('/api/logs/list', methods=['GET'])
+def get_logs():
+    if 'user' not in session:
+        return redirect(url_for("login"))
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute("SELECT * FROM logs ORDER BY timestamp DESC")
+        rows = c.fetchall()
+        logs = [dict(row) for row in rows]
+        conn.close()
+        
+        return make_response(
+            {
+                "code": 200,
+                "message": "OK",
+                "entries": logs
+            },
+            200
+        )
+    except Exception as e:
+        logging.error(f"Failed to fetch logs: {e}")
+        return make_response(
+            {
+                "code": 500,
+                "message": "Internal server error"
+            },
+            500
+        )
+
+
 if __name__ == '__main__':
+    init_db()
     app.run(debug=False, host=SRV_ADDRESS, port=SRV_PORT)
