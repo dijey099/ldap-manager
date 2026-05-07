@@ -1,0 +1,1 @@
+./certgen --host <YOUR_SERVER_FQDN_OR_IP>

@@ -24,6 +24,7 @@ app.secret_key = secrets.token_hex(16)
 
 SRV_ADDRESS = os.getenv('SRV_ADDRESS', "localhost")
 SRV_PORT = os.getenv('SRV_PORT', 8080)
+SRV_SSL = os.getenv('SSL', 'False')
 
 LDAP_SERVER = os.getenv('LDAP_SERVER', 'ldap://server.com')
 
@@ -36,6 +37,11 @@ ADMIN_DN = os.getenv('ADMIN_DN', 'cn=admin,dc=server,dc=come')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'v3rY5Ecre7')
 
 ADMINS_DN = os.getenv('ADMINS_DN', 'dc=server,dc=com')
+
+DEBUG_STATUS = os.getenv('DEBUG', 'False')
+DEBUG = False
+if DEBUG_STATUS == "True":
+    DEBUG = True
 
 DB_PATH = "logs.db"
 
@@ -954,4 +960,13 @@ def get_logs():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=False, host=SRV_ADDRESS, port=SRV_PORT)
+    if SRV_SSL == "True":
+        public_key = "ssl/public.crt"
+        private_key = "ssl/private.key"
+        if os.path.exists(public_key) and os.path.exists(private_key):
+            context = (public_key, private_key)
+            app.run(debug=DEBUG, host=SRV_ADDRESS, port=SRV_PORT, ssl_context=context)
+        else:
+            logging.error("Missing public.crt or private.key in ./ssl directory. Run \"cd ssl && ./certgen --host <YOUR_SERVER_FQDN_OR_IP>\"")
+    else:
+        app.run(debug=DEBUG, host=SRV_ADDRESS, port=SRV_PORT)
