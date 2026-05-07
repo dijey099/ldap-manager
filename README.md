@@ -50,14 +50,21 @@ Create a `.env` file in the root directory and configure your LDAP settings:
 
 ```ini
 LDAP_SERVER=ldap://your-ldap-server-ip
+
 U_BASE_DN=ou=people,dc=example,dc=com
 G_BASE_DN=ou=groups,dc=example,dc=com
+
 ADMIN_DN=cn=admin,dc=example,dc=com
 ADMIN_PASSWORD=your-secure-password
-ADMINS_DN=cn=admins,ou=groups,dc=example,dc=com
+ADMINS_DN=cn=ldap-manager-admins,ou=groups,dc=example,dc=com
+
 DEPARTMENTS=HR,IT,Finance,Sales
+
 SRV_ADDRESS=0.0.0.0
 SRV_PORT=8080
+SSL=False
+
+DEBUG=False
 ```
 *ADMINS_DN is the group that contains users who have access to Admin Dashboard*
 
