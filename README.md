@@ -65,6 +65,8 @@ SRV_PORT=8080
 SSL=False
 
 DEBUG=False
+
+DEFAULT_PASSWD=s3cre7
 ```
 *ADMINS_DN is the group that contains users who have access to Admin Dashboard*
 

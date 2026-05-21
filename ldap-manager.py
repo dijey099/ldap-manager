@@ -33,6 +33,8 @@ G_BASE_DN = os.getenv('G_BASE_DN', 'ou=groups,dc=server,dc=com')
 
 DEPARTMENTS = os.getenv('DEPARTMENTS', 'HR,HSE,IS')
 
+DEFAULT_PASSWD = os.getenv('DEFAULT_PASSWD', 'admin123')
+
 ADMIN_DN = os.getenv('ADMIN_DN', 'cn=admin,dc=server,dc=come')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'v3rY5Ecre7')
 
@@ -219,7 +221,7 @@ def add_user(uid, kind, givenName, sn, title, departmentNumber, mobile, mail):
                     "posixAccount",
                     "shadowAccount"
                 ],
-                "userPassword": "{SSHA}T6nQZ5iN2SZqObXuDGp7n1Gzhdkx5tay",
+                "userPassword": DEFAULT_PASSWD,
                 "loginShell": "/bin/bash" if kind == 0 else "/usr/local/bin/bastion",
                 "homeDirectory": f"/home/{uid.strip()}"
             }
