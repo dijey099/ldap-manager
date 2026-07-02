@@ -644,7 +644,7 @@ def add_u():
     rdata = request.get_json()
 
     uid = rdata.get('username')
-    kind = rdata.get('kind')    # Admin bastion(0) or server(1)
+    kind = rdata.get('kind')    # Bastion admin(0) or Bastion user(1)
     givenName = rdata.get('first_name')
     sn = rdata.get('last_name')
     title = rdata.get('title')
