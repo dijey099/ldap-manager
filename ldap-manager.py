@@ -49,7 +49,7 @@ DB_PATH = "logs.db"
 app = Flask(__name__, template_folder='web', static_folder='static')
 app.debug = DEBUG
 app.secret_key = secrets.token_hex(16)
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=SESSION_EXPIRATION)
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=int(SESSION_EXPIRATION))
 
 
 def init_db():
