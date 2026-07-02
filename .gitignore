@@ -2,3 +2,4 @@
 ldap-manager.log
 ssl/private.key
 ssl/public.crt
+logs.db
