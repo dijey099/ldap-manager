@@ -3,7 +3,7 @@ import json
 import logging
 import secrets
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, MODIFY_ADD, MODIFY_DELETE
 from flask import Flask, request, make_response, session, render_template, redirect, url_for
@@ -17,10 +17,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
-
-app = Flask(__name__, template_folder='web', static_folder='static')
-app.debug = True
-app.secret_key = secrets.token_hex(16)
 
 SRV_ADDRESS = os.getenv('SRV_ADDRESS', "localhost")
 SRV_PORT = os.getenv('SRV_PORT', 8080)
@@ -45,7 +41,15 @@ DEBUG = False
 if DEBUG_STATUS == "True":
     DEBUG = True
 
+SESSION_EXPIRATION = os.getenv('SESSION_EXPIRATION', 3600)
+
 DB_PATH = "logs.db"
+
+
+app = Flask(__name__, template_folder='web', static_folder='static')
+app.debug = DEBUG
+app.secret_key = secrets.token_hex(16)
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=SESSION_EXPIRATION)
 
 
 def init_db():
