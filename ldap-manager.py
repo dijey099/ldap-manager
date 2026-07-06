@@ -124,9 +124,8 @@ def authenticate(username, password):
         else:
             g_dn = ADMINS_DN.split(',')
             g_name = g_dn[0].replace("cn=", "")
-            g_search_base = ",".join(g_dn[1:])
             search_filter = f'(&(objectClass=posixGroup)(cn={g_name}))'
-            conn.search(search_base=g_search_base,
+            conn.search(search_base=G_BASE_DN,
                         search_filter=search_filter,
                         attributes=['memberUid'])
             if conn.entries:
