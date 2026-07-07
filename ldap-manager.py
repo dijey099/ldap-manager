@@ -187,6 +187,11 @@ def add_user(uid, kind, givenName, sn, title, departmentNumber, mobile, mail):
         server = Server(LDAP_SERVER, get_info=ALL)
         conn = Connection(server, ADMIN_DN, ADMIN_PASSWORD, auto_bind=True)
 
+        user_exists = get_user_dn(uid)
+        if user_exists:
+            logging.error(f"Failed to add new user {uid} - Already exists")
+            return False
+
         conn.search(
             search_base=U_BASE_DN,
             search_filter="(objectClass=posixAccount)",
